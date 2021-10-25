@@ -16,7 +16,7 @@ workflows:
   build-and-push-ecr:
     jobs:
       - aws-ecr/build-and-push-image:
-          account-url: $AWS_RESOURCE_NAME_PREFIX
+          account-url: $AWS_ECR_ACCOUNT_URL
           repo: "large-button-api"
           create-repo: true
           tag: "${CIRCLE_SHA1}"
