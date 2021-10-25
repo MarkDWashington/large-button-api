@@ -17,6 +17,7 @@ workflows:
     jobs:
       - aws-ecr/build-and-push-image:
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          create-repo: true
           tag: "${CIRCLE_SHA1}"
           filters:
             branches:
