@@ -18,6 +18,7 @@ workflows:
       - aws-ecr/build-and-push-image:
           repo: "large-button-api"
           tag: "latest"
+          create-repo: true
           filters:
             branches:
               only: main
