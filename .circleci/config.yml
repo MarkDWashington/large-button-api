@@ -20,5 +20,5 @@ workflows:
           tag: "${CIRCLE_SHA1}"
           filters:
             branches:
-              only: master
+              only: main
           
