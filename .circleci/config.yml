@@ -18,7 +18,7 @@ workflows:
       - aws-ecr/build-and-push-image:
           repo: "large-button"
           create-repo: true
-          tag: "${CIRCLE_SHA1}"
+          tag: "latest"
           filters:
             branches:
               only: main
