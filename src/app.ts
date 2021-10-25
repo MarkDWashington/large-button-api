@@ -1,10 +1,13 @@
+import http from "http";
 import express from "express";
+import { createTerminus } from "@godaddy/terminus";
+
 import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 
 const app = express();
 const port = 3000;
 
-app.get("/increment-button", (req, res) => {
+app.get("/increment", (req, res) => {
   const client = new DynamoDBClient({ region: "us-east-2" });
   const dbUpdateCommand = new UpdateItemCommand({
     TableName: "Clear-Button",
@@ -14,7 +17,7 @@ app.get("/increment-button", (req, res) => {
       }
     },
     UpdateExpression: "SET V = V + :one",
-    ExpressionAttributeValues: {":one": {N: "1"}},
+    ExpressionAttributeValues: { ":one": { N: "1" } },
     ReturnValues: "UPDATED_NEW"
   });
 
@@ -28,6 +31,23 @@ app.get("/increment-button", (req, res) => {
   }).catch((err) => res.send(err));
 });
 
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
+async function healthCheck(): Promise<void> {
+  return Promise.resolve();
+}
+
+async function signalHandler(): Promise<void> {
+  console.log("Server is shutting down.");
+}
+
+const server = http.createServer(app);
+createTerminus(server, {
+  signal: "SIGINT",
+  healthChecks: {
+    "/healthcheck": healthCheck,
+  },
+  onSignal: signalHandler
 });
+
+server.listen(3000, () => {
+  console.log(`Server is listening on port ${port}`);
+})
