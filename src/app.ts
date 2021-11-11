@@ -1,11 +1,41 @@
 import http from "http";
 import express from "express";
+import cors from "cors";
 import { createTerminus } from "@godaddy/terminus";
 
-import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 
 const app = express();
+const corsOptions: cors.CorsOptions = {
+  origin: ["http://localhost:3000"]
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
 const port = 3000;
+
+app.get("/current", (req, res) => {
+  const client = new DynamoDBClient({ region: "us-east-2" });
+  const dbGetCommand = new GetItemCommand({
+    TableName: "Clear-Button",
+    Key: {
+      "Key": {
+        S: "count"
+      }
+    }
+  });
+
+  const response = client.send(dbGetCommand);
+  response.then((value) => {
+    if (value.Item && value.Item.V.N) {
+      res.send(value.Item.V.N);
+    } else {
+      throw "Something went wrong";
+    }
+  }).catch((err) => {res.send(err);});
+
+});
 
 app.get("/increment", (req, res) => {
   const client = new DynamoDBClient({ region: "us-east-2" });
@@ -50,4 +80,4 @@ createTerminus(server, {
 
 server.listen(3000, () => {
   console.log(`Server is listening on port ${port}`);
-})
+});
